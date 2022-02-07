@@ -85,3 +85,20 @@ having t > 15;
 select distinct salary from salaries
 order by salary desc;
 ```
+
+[SQL10 获取所有非manager的员工emp_no](https://www.nowcoder.com/practice/32c53d06443346f4a2f2ca733c19660c?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+
+```sql
+select emp_no from employees 
+where emp_no not in 
+(select emp_no from dept_manager);
+
+select e.emp_no 
+from employees as e
+left join dept_manager as d
+on e.emp_no = d.emp_no
+where d.dept_no is null;
+```
+
+- 可以使用 not in 或者 left join。
+
