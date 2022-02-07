@@ -40,3 +40,12 @@ limit 1 offset 2);
 ```
 - 考虑到入职时间可能有相同的，所以需要用 **distinct** 或者 **group by** 去重。
 
+[]()
+```sql
+select d.emp_no, s.salary, s.from_date, s.to_date, d.dept_no 
+from dept_manager as d 
+left join salaries as s
+on d.emp_no = s.emp_no
+where d.to_date = '9999-01-01' and s.to_date = '9999-01-01'
+order by s.emp_no;
+```
