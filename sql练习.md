@@ -141,3 +141,23 @@ group by d.dept_no) as ms /*部门编号 最大薪水*/
 on uni.dept_no = ms.dept_no and uni.salary = ms.maxSalary 
 order by uni.dept_no;
 ```
+
+[SQL15 查找employees表emp_no与last_name的员工信息](https://www.nowcoder.com/practice/a32669eb1d1740e785f105fa22741d5c?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+```sql
+select * from employees
+where emp_no & 1 and last_name <> 'Mary'
+order by hire_date desc;
+```
+
+- 本题要保留 emp_no 是**奇数**的，可以**使用 & 运算符号**。(或者使用 mod(emp_no, 2) = 1， 但是某些 sql 版本可能没有这个函数)
+
+[SQL16 统计出当前各个title类型对应的员工当前薪水对应的平均工资](https://www.nowcoder.com/practice/c8652e9e5a354b879e2a244200f1eaae?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+
+```sql
+select t.title, avg(s.salary) 
+from titles as t
+join salaries as s
+on t.emp_no = s.emp_no
+group by t.title
+order by avg(s.salary);
+```
