@@ -161,3 +161,13 @@ on t.emp_no = s.emp_no
 group by t.title
 order by avg(s.salary);
 ```
+
+[SQL17 获取当前薪水第二多的员工的emp_no以及其对应的薪水salary](https://www.nowcoder.com/practice/8d2c290cc4e24403b98ca82ce45d04db?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+```sql
+select emp_no, salary from salaries 
+where salary = 
+(select distinct salary from salaries
+ order by salary desc 
+limit 1 offset 1 /*从 1 开始，取一个*/) 
+order by emp_no;
+```
