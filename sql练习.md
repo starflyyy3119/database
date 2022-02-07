@@ -40,7 +40,7 @@ limit 1 offset 2);
 ```
 - 考虑到入职时间可能有相同的，所以需要用 **distinct** 或者 **group by** 去重。
 
-[]()
+[SQL3 查找当前薪水详情以及部门编号dept_no](https://www.nowcoder.com/practice/c63c5b54d86e4c6d880e4834bfd70c3b?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82%26page%3D1&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
 ```sql
 select d.emp_no, s.salary, s.from_date, s.to_date, d.dept_no 
 from dept_manager as d 
@@ -49,3 +49,15 @@ on d.emp_no = s.emp_no
 where d.to_date = '9999-01-01' and s.to_date = '9999-01-01'
 order by s.emp_no;
 ```
+
+- 注意领导表里面可能还会存在**曾经的领导**，所以还需要限制to_date条件。
+
+[SQL 4 查找所有已经分配部门的员工的last_name和first_name以及dept_no](https://www.nowcoder.com/practice/6d35b1cd593545ab985a68cd86f28671?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82%26page%3D1&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+```sql
+select e.last_name, e.first_name, d.dept_no 
+from dept_emp as d
+left join employees as e
+on d.emp_no = e.emp_no;
+```
+- 因为查询的是已经分配部门的员工，所以以**部门表作为左表**进行连接。
+
