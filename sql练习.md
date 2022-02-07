@@ -21,3 +21,22 @@ select * from employees
     where hire_date = (select max(hire_date) from employees);
 
 ```
+
+[SQL2 查找入职员工时间排名倒数第三的员工所有信息](https://www.nowcoder.com/practice/ec1ca44c62c14ceb990c3c40def1ec6c?tpId=82&tqId=29754&rp=1&ru=/exam/oj&qru=/exam/oj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82%26page%3D1&difficulty=undefined&judgeStatus=undefined&tags=&title=)
+```sql
+select * from employees
+where hire_date = 
+(select distinct hire_date from employees 
+order by hire_date desc
+limit 1 offset 2);
+
+
+select * from employees
+where hire_date = 
+(select hire_date from employees
+group by hire_date 
+order by hire_date desc 
+limit 1 offset 2);
+```
+- 考虑到入职时间可能有相同的，所以需要用 **distinct** 或者 **group by** 去重。
+
