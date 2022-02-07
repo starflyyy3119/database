@@ -102,3 +102,42 @@ where d.dept_no is null;
 
 - 可以使用 not in 或者 left join。
 
+[SQL11 获取所有员工当前的manager](https://www.nowcoder.com/practice/e50d92b8673a440ebdf3a517b5b37d62?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+
+```sql
+select d.emp_no, m.emp_no as manager
+from dept_emp as d
+left join dept_manager as m
+on d.dept_no = m.dept_no
+where d.emp_no <> manager and m.to_date = '9999-01-01';
+```
+[SQL12 获取每个部门中当前员工薪水最高的相关信息]()
+- 错误写法
+误区：使用GROUP BY子句后，select 语句中只能出现**group by语句中出现的字段，或者聚合函数，或者常数**，所以这里无法同时出现dept_no,emp_no.
+(mysql语法松散，允许出现select语句中出现group by语句未出现的字段，但这样展示没有意义，因为记录并没有对应，默认取第一条，所以可能出现对应错误。
+```sql
+/*select d.dept_no, d.emp_no, max(s.salary) as maxSalary
+from dept_emp as d
+join salaries as s
+on d.emp_no = s.emp_no
+group by d.dept_no
+order by d.dept_no
+*/
+```
+
+```sql
+select uni.dept_no, uni.emp_no, uni.salary
+from 
+(select d.dept_no, d.emp_no, s.salary 
+from dept_emp as d
+join salaries as s
+on d.emp_no = s.emp_no) as uni /*部门编号 员工编号 薪水*/
+join 
+(select d.dept_no, max(s.salary) as maxSalary
+from dept_emp as d
+join salaries as s
+on d.emp_no = s.emp_no
+group by d.dept_no) as ms /*部门编号 最大薪水*/
+on uni.dept_no = ms.dept_no and uni.salary = ms.maxSalary 
+order by uni.dept_no;
+```
