@@ -61,3 +61,12 @@ on d.emp_no = e.emp_no;
 ```
 - 因为查询的是已经分配部门的员工，所以以**部门表作为左表**进行连接。
 
+[SQL5 查找所有员工的last_name和first_name以及对应部门编号dept_no](https://www.nowcoder.com/practice/dbfafafb2ee2482aa390645abd4463bf?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82%26page%3D1&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+```sql
+select e.last_name, e.first_name, d.dept_no
+from employees as e 
+left join dept_emp as d
+on e.emp_no = d.emp_no;
+```
+
+- 与上题的区别在于**没有分配部门的员工也要输出来**，所以以员工表为左表连接。
