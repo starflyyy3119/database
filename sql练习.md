@@ -70,3 +70,11 @@ on e.emp_no = d.emp_no;
 ```
 
 - 与上题的区别在于**没有分配部门的员工也要输出来**，所以以员工表为左表连接。
+
+[SQL7 查找薪水记录超过15次的员工号emp_no以及其对应的记录次数t](https://www.nowcoder.com/practice/6d4a4cff1d58495182f536c548fee1ae?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+```Java
+select emp_no, count(*) as t 
+from salaries
+group by emp_no
+having t > 15;
+```
