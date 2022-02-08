@@ -303,6 +303,54 @@ where emp_salary > manager_salary;
 ```
 - 步骤分开，分别击破
 
+[SQL26 汇总各个部门当前员工的title类型的分配数目](https://www.nowcoder.com/practice/4bcb6a7d3e39423291d2f7bdbbff87f8?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+
+```sql
+select d.dept_no, d.dept_name, t.title, count(*)
+from titles as t
+join dept_emp as de
+on t.emp_no = de.emp_no
+join departments as d
+on de.dept_no = d.dept_no
+group by d.dept_no, d.dept_name, t.title
+order by d.dept_no, t.title
+```
+
+[SQL29 使用join查询方式找出没有分类的电影id以及名称](https://www.nowcoder.com/practice/a158fa6e79274ac497832697b4b83658?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+```sql
+select f.film_id, f.title 
+from film as f
+left join film_category as fc
+on f.film_id = fc.film_id
+where fc.category_id is null
+```
+
+- 跟 null 比较的时候需要用 is null 和 is not null。
+
+[SQL30 使用子查询的方式找出属于Action分类的所有电影对应的title,description](https://www.nowcoder.com/practice/2f2e556d335d469f96b91b212c4c203e?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+
+```sql
+select f.title, f.description
+from film as f
+where f.film_id in 
+(select fc.film_id 
+from film_category as fc
+join category as c
+on fc.category_id = c.category_id
+where c.name = 'Action')
+```
+- 练习子查询。
+
+[SQL32 将employees表的所有员工的last_name和first_name拼接起来作为Name](https://www.nowcoder.com/practice/6744b90bbdde40209f8ecaac0b0516fe?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+```sql
+/*sqlite 用 || 拼接*/
+select last_name || " " || first_name as name from employees
+
+/*mysql 用 concat*/
+select concat(last_name, " ", first_name) as name from employees;
+```
+
+
 
 
 
