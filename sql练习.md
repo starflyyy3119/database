@@ -234,7 +234,7 @@ group by d.dept_no, d.dept_name
 order by d.dept_no
 ```
 
-[]()
+[SQL23 对所有员工的薪水按照salary降序进行1-N的排名](https://www.nowcoder.com/practice/b9068bfe5df74276bd015b9729eec4bf?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
 
 ```sql
 select emp_no, salary, dense_rank() over(order by salary desc) as rank
