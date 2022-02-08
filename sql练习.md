@@ -258,6 +258,51 @@ order by rank, emp_no
                                 ORDER BY <排序用列清单> ）
 *其中[ ]中的内容可以忽略
 
+[SQL24 获取所有非manager员工当前的薪水情况](https://www.nowcoder.com/practice/8fe212a6c71b42de9c15c56ce354bebe?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+
+```sql
+select de.dept_no, e.emp_no, s.salary
+from employees as e
+join dept_emp as de
+on e.emp_no = de.emp_no
+join salaries as s
+on s.emp_no = e.emp_no
+where e.emp_no not in (select emp_no from dept_manager)
+
+select de.dept_no, e.emp_no, s.salary
+from employees as e
+join dept_emp as de
+on e.emp_no = de.emp_no
+join salaries as s
+on s.emp_no = e.emp_no
+left join dept_manager as dm
+on e.emp_no = dm.emp_no
+where dm.emp_no is null
+```
+
+- 第一种写法是正常的使用 not in 去掉 manager 的 emp_no。第二种可以使用左连接，由于 manager 表只有 manager 的 emp_no, 所以在连接的过程中会有 null 的情况，为 null 的就是所有不是 manager 的员工。
+
+[SQL25 获取员工其当前的薪水比其manager当前薪水还高的相关信息](https://www.nowcoder.com/practice/f858d74a030e48da8e0f69e21be63bef?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+```sql
+select ss.emp_no, m.emp_no as manager_no,
+ss.salary as emp_salary, m.salary as manager_salary
+from
+/*员工 的工资*/
+(select s.emp_no, s.salary, de.dept_no
+from salaries as s
+join dept_emp as de
+on s.emp_no = de.emp_no) as ss
+join 
+/*manager 的工资*/
+(select dm.dept_no, dm.emp_no, s.salary
+from dept_manager as dm
+join salaries as s
+on dm.emp_no = s.emp_no) as m
+on ss.dept_no = m.dept_no
+where emp_salary > manager_salary;
+```
+- 步骤分开，分别击破
+
 
 
 
