@@ -111,6 +111,9 @@ left join dept_manager as m
 on d.dept_no = m.dept_no
 where d.emp_no <> manager and m.to_date = '9999-01-01';
 ```
+
+- 注意：**以下的 sql 中为了可读性都省略了 to_date, 实际中 to_date 保证了当前员工没有离职，并且是最新的工资数据(因为可能存在升职加薪的情况)应该加上**。
+
 [SQL12 获取每个部门中当前员工薪水最高的相关信息]()
 - 错误写法
 误区：使用GROUP BY子句后，select 语句中只能出现**group by语句中出现的字段，或者聚合函数，或者常数**，所以这里无法同时出现dept_no,emp_no.
@@ -171,3 +174,52 @@ where salary =
 limit 1 offset 1 /*从 1 开始，取一个*/) 
 order by emp_no;
 ```
+
+[SQL18 获取当前薪水第二多的员工的emp_no以及其对应的薪水salary](https://www.nowcoder.com/practice/c1472daba75d4635b7f8540b837cc719?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+```sql
+select e.emp_no, s.salary, e.last_name, e.first_name
+from employees as e
+join salaries as s
+on e.emp_no = s.emp_no
+where salary = 
+(select max(salary) from salaries
+where salary < 
+(select max(salary) from salaries))
+```
+- 本题目不允许使用 order by，还需要排名工资第二高的员工信息，所以可以先找最高的 salary，再找第二高的 salary。
+
+[SQL19 查找所有员工的last_name和first_name以及对应的dept_name](https://www.nowcoder.com/practice/5a7975fabe1146329cee4f670c27ad55?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+
+```sql
+select e.last_name, e.first_name, d.dept_name
+from employees as e
+left join dept_emp as de
+on e.emp_no = de.emp_no
+left join departments as d
+on de.dept_no = d.dept_no
+```
+- 三表连接。因为没有分配 dept 的员工也要出现，所以以 employees 作为主表进行左连接。
+
+[SQL21 查找在职员工自入职以来的薪水涨幅情况](https://www.nowcoder.com/practice/fc7344ece7294b9e98401826b94c6ea5?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+```sql
+select pre.emp_no, (now.salary - pre.salary) as growth
+from 
+/*入职薪水*/
+(select e.emp_no, s.salary
+from employees as e
+join salaries as s
+on e.emp_no = s.emp_no 
+and e.hire_date = s.from_date) as pre
+join 
+/*当前薪水*/
+(select s.emp_no, s.salary
+from salaries as s
+where s.to_date = '9999-01-01') as now
+on pre.emp_no = now.emp_no
+order by growth;
+```
+- 获取入职薪水和当前薪水相减即可。
+
+
+
+
