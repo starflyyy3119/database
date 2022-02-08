@@ -201,6 +201,7 @@ on de.dept_no = d.dept_no
 - 三表连接。因为没有分配 dept 的员工也要出现，所以以 employees 作为主表进行左连接。
 
 [SQL21 查找在职员工自入职以来的薪水涨幅情况](https://www.nowcoder.com/practice/fc7344ece7294b9e98401826b94c6ea5?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+
 ```sql
 select pre.emp_no, (now.salary - pre.salary) as growth
 from 
@@ -219,6 +220,44 @@ on pre.emp_no = now.emp_no
 order by growth;
 ```
 - 获取入职薪水和当前薪水相减即可。
+
+[SQL22 统计各个部门的工资记录数](https://www.nowcoder.com/practice/6a62b6c0a7324350a6d9959fa7c21db3?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+
+```sql
+select d.dept_no, d.dept_name, count(*) as sum
+from departments as d
+join dept_emp as de
+on d.dept_no = de.dept_no
+join salaries as s
+on de.emp_no = s.emp_no
+group by d.dept_no, d.dept_name
+order by d.dept_no
+```
+
+[]()
+
+```sql
+select emp_no, salary, dense_rank() over(order by salary desc) as rank
+from salaries
+order by rank, emp_no
+```
+- RANK()
+    - 在计算排序时，若**存在相同位次，会跳过之后的位次**。
+    - 例如，有3条排在第1位时，排序为：1，1，1，4······
+
+- DENSE_RANK()
+    - 这就是题目中所用到的函数，在计算排序时，若**存在相同位次，不会跳过之后的位次**。
+    - 例如，有3条排在第1位时，排序为：1，1，1，2······
+
+- ROW_NUMBER()
+    - 这个函数赋予**唯一的连续位次**。
+    - 例如，有3条排在第1位时，排序为：1，2，3，4······
+
+- 窗口函数用法：
+<窗口函数> OVER ( [PARTITION BY <列清单> ]
+                                ORDER BY <排序用列清单> ）
+*其中[ ]中的内容可以忽略
+
 
 
 
