@@ -350,7 +350,7 @@ select last_name || " " || first_name as name from employees
 select concat(last_name, " ", first_name) as name from employees;
 ```
 
-[SQL33 创建一个actor表，包含如下列信息]()
+[SQL33 创建一个actor表，包含如下列信息](https://www.nowcoder.com/practice/ac233de508ef4849b0eeb4f38dcf09cf?tpId=82&tqId=29801&rp=1&ru=/exam/oj&qru=/exam/oj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82%26page%3D1&difficulty=undefined&judgeStatus=undefined&tags=&title=)
 ```sql
 create table actor
 (actor_id smallint(5) not null primary key,
@@ -389,6 +389,20 @@ create table actor
         COMMENT = 'string'
     - 分区选项
         PARTITION BY ... (详细见手册)
+
+[SQL34 批量插入数据](                              )
+```sql
+insert into actor VALUES
+(1, 'PENELOPE', 'GUINESS', '2006-02-15 12:34:33'),
+(2, 'NICK', 'WAHLBERG', '2006-02-15 12:34:33');
+```
+
+- 增
+    - INSERT [INTO] 表名 [(字段列表)] VALUES (值列表)[, (值列表), ...]
+        - 如果要插入的值列表包含所有字段并且顺序一致，则可以省略字段列表。
+        - 可同时插入多条数据记录！
+        REPLACE 与 INSERT 完全一样，可互换。
+    - INSERT [INTO] 表名 SET 字段名=值[, 字段名=值, ...]
 
 
 
