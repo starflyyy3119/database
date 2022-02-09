@@ -350,6 +350,46 @@ select last_name || " " || first_name as name from employees
 select concat(last_name, " ", first_name) as name from employees;
 ```
 
+[SQL33 创建一个actor表，包含如下列信息]()
+```sql
+create table actor
+(actor_id smallint(5) not null primary key,
+ first_name varchar(45) not null,
+ last_name varchar(45) not null,
+ last_update date not null
+);
+```
+- 创建表
+    - CREATE [TEMPORARY] TABLE[ IF NOT EXISTS] [库名.]表名 ( 表的结构定义 )[ 表选项]
+        - 每个字段必须有数据类型
+        - 最后一个字段后不能有逗号
+        - TEMPORARY 临时表，会话结束时表自动消失
+        - 对于字段的定义：
+            - 字段名 数据类型 [NOT NULL | NULL] [DEFAULT default_value] [AUTO_INCREMENT] [UNIQUE [KEY] | [PRIMARY] KEY] [COMMENT 'string']
+- 表选项
+    - 字符集
+        - CHARSET = charset_name
+        - 如果表没有设定，则使用数据库字符集
+    - 存储引擎
+        - ENGINE = engine_name
+        - 表在管理数据时采用的不同的数据结构，结构不同会导致处理方式、提供的特性操作等不同
+        - 常见的引擎：InnoDB MyISAM Memory/Heap BDB Merge Example CSV MaxDB Archive
+        - 不同的引擎在保存表的结构和数据时采用不同的方式
+        MyISAM表文件含义：.frm表定义，.MYD表数据，.MYI表索引
+        InnoDB表文件含义：.frm表定义，表空间数据和日志文件
+        - SHOW ENGINES -- 显示存储引擎的状态信息
+        - SHOW ENGINE 引擎名 {LOGS|STATUS} -- 显示存储引擎的日志或状态信息
+    - 自增起始数
+    	AUTO_INCREMENT = 行数
+    - 数据文件目录
+        DATA DIRECTORY = '目录'
+    - 索引文件目录
+        INDEX DIRECTORY = '目录'
+    - 表注释
+        COMMENT = 'string'
+    - 分区选项
+        PARTITION BY ... (详细见手册)
+
 
 
 
