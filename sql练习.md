@@ -406,7 +406,7 @@ insert into actor VALUES
 - mysql 中常见的三种插入数据的语句:
     - insert into 表示插入数据，数据库会**检查主键，如果出现重复会报错**；
     - replace into 表示插入替换数据，如果数据库已经存在数据，则**用新数据替换**，如果没有数据效果则和 insert into 一样；
-    - insert ignore表示，如果中已经存在相同的记录，则**忽略当前新数据**；
+    - insert ignore 表示，如果中已经存在相同的记录，则**忽略当前新数据**；
 
 [SQL35 批量插入数据，不使用replace操作](https://www.nowcoder.com/practice/153c8a8e7805400ba8e384e03acc6b3e?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82%26page%3D1&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
 ```sql
@@ -414,6 +414,109 @@ insert ignore into actor values
 ('3', 'ED', 'CHASE', '2006-02-15 12:34:33');
 ```
 
+[SQL36 创建一个actor_name表](https://www.nowcoder.com/practice/881385f388cf4fe98b2ed9f8897846df?tpId=82&tqId=29804&rp=1&ru=/exam/oj&qru=/exam/oj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82%26page%3D1&difficulty=undefined&judgeStatus=undefined&tags=&title=)
+
+本题目考察MYSQL创建数据表的三种方法：
+
+- 常规创建
+create table if not exists 目标表
+- 复制表格
+create 目标表 like 来源表
+- 将table1的部分拿来创建table2
+
+```sql
+CREATE TABLE actor_name    -- 创建表
+(first_name varchar(45) NOT NULL,
+ last_name varchar(45) NOT NULL);
+ 
+INSERT INTO actor_name  -- 插入数据
+SELECT first_name,last_name
+FROM actor;
+```
+
+[SQL37 对first_name创建唯一索引uniq_idx_firstname](https://www.nowcoder.com/practice/e1824daa0c49404aa602cf0cb34bdd75?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82%26page%3D1&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+
+```sql
+alter table actor add unique uniq_idx_firstname(first_name);
+alter table actor add index idx_lastname(last_name);
+```
+
+[Mysql 索引详解](https://javaguide.cn/database/mysql/mysql-index/#)
+- 什么是索引？作用?
+    - 索引是一种用于**快速查询**和**检索数据**的数据结构。
+- 优缺点:
+    - 优点: 
+        - 大大**加快**数据的检索**速度**(大大减少数据检索量)
+        - 通过创建**唯一性索引**，可以保证数据库中的每一行数据的**唯一性**
+    - 缺点:
+        - **创建**和**维护**索引需要耗费许多时间。增删改的时候，索引动态修改，影响 SQL 执行效率。
+        - 索引也需要**物理文件储存**。
+- 索引一定带来速度提升吗？
+    - 跟数据库的大小有关，数据量不大，也不一定带来提升。
+- 索引的数据结构：
+    - Hash 表：键值对的集合，通过 hash 算法快速找到 value 对应的 index，找到 index 也就找到了 value。
+        - hash 冲突:
+            - 拉链法
+            - 开放寻址法
+        - mysql 为什么不用 Hash 表？
+            - hash 冲突
+            - 不支持**顺序查询和范围查询**
+    - B & B+ 树
+        - 异同：
+            - B 树的所有节点既存放 key 也存放 data，B+ 树只有**叶子节点**存放 key 和 data，其他节点只存放 key。
+            - B 树的叶子节点是**独立**的；B+ 树的叶子节点有一条**引用链**指向与它相邻的叶子节点(双向链表)。
+            - B 树在每个节点都有可能查到数据，效率不稳定；B+树必须查到叶子节点，效率稳定。
+- 聚集索引与非聚集索引:
+    - 聚集索引: 数据页会按照 index 建立的方式排序. (就像字典的字母序目录一样)，**只能有一个**
+        - 优点: **区间搜索**高效；由于磁盘在顺序读取时有预读取(prefetching) 机制，所以会有 potential locality benefits
+        - 缺点: **依赖有序的数据页**，需要在插入的时候排序；**维护更新**代价大
+    - 非聚集索引: 数据页没有按照 index 建立的方式排序。可以建立**很多个**。
+        - 优点: 更新代价比聚集索引小。
+        - 缺点: **可能会二次查询(回表)**：当查到索引对应的指针或者主键后，可能还需要回到数据文件或者表中查询。
+- 索引类型:
+    - 主键索引(Primary Key): 数据表的主键列使用的就是主键索引。**只能有一个主键，且不能为 NULL， 不能重复**。
+    - 二级索引(辅助索引): 二级索引的叶子节点**存储的数据是主键**。通过二级索引，可以定位主键的位置。
+        - 唯一索引(Unique Key): **唯一索引也是一种约束。唯一索引的属性列不能出现重复的数据，但是允许数据为 NULL，一张表允许创建多个唯一索引。** 建立唯一索引的目的大部分时候都是为了该属性列的数据的唯一性，而不是为了查询效率。
+        - 普通索引(Index): **普通索引的唯一作用就是为了快速查询数据，一张表允许创建多个普通索引，并允许数据重复和 NULL。**
+        - 前缀索引(Prefix) 
+        - 全文索引(Full Text) 
+- 索引注意事项:
+    - 选择合适字段:
+        - 尽量不为 NULL
+        - 频繁查询的字段
+        - 被作为条件查询的字段
+        - 频繁排序的字段
+        - 频繁连接的字段
+    - **频繁更新字段**谨慎建立索引
+    - 尽可能**联合索引**(多个字段在一个索引上)
+    - 避免索引冗余
+    - 在字符串类型的字段上使用**前缀索引代替普通索引**
+- 如何添加索引
+    - 主键索引:
+    ```sql
+    ALTER TABLE `table_name` ADD PRIMARY KEY ( `column` )
+    ```
+    - 唯一索引:
+    ```sql
+    ALTER TABLE `table_name` ADD UNIQUE ( `column` )
+    ```
+    - 普通索引:
+    ```sql
+    ALTER TABLE `table_name` ADD INDEX index_name ( `column` )
+    ```
+    - 全文索引:
+    ```sql
+    ALTER TABLE `table_name` ADD FULLTEXT ( `column`)
+    ```
+    - 多列索引:
+    ```sql
+    ALTER TABLE `table_name` ADD INDEX index_name ( `column1`, `column2`, `column3` )
+    ```
+
+
+
+
+    
 
 
 
