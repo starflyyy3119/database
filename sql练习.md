@@ -403,6 +403,17 @@ insert into actor VALUES
         - 可同时插入多条数据记录！
         REPLACE 与 INSERT 完全一样，可互换。
     - INSERT [INTO] 表名 SET 字段名=值[, 字段名=值, ...]
+- mysql 中常见的三种插入数据的语句:
+    - insert into 表示插入数据，数据库会**检查主键，如果出现重复会报错**；
+    - replace into 表示插入替换数据，如果数据库已经存在数据，则**用新数据替换**，如果没有数据效果则和 insert into 一样；
+    - insert ignore表示，如果中已经存在相同的记录，则**忽略当前新数据**；
+
+[SQL35 批量插入数据，不使用replace操作](https://www.nowcoder.com/practice/153c8a8e7805400ba8e384e03acc6b3e?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82%26page%3D1&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+```sql
+insert ignore into actor values
+('3', 'ED', 'CHASE', '2006-02-15 12:34:33');
+```
+
 
 
 
