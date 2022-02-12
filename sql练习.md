@@ -521,10 +521,10 @@ as select first_name, last_name from actor;
 ```
 
 - 什么是视图：
-    - 视图是一个虚拟表，其内容由查询定义。同真实的表一样，视图包含一系列带有名称的列和行数据。但是，视图并不在数据库中以存储的数据值集形式存在。行和列数据来自由定义视图的查询所引用的表，并且在引用视图时动态生成。
-    - 视图具有表结构文件，但不存在数据文件。
-    - 对其中所引用的基础表来说，视图的作用类似于筛选。定义视图的筛选可以来自当前或其它数据库的一个或多个表，或者其它视图。通过视图进行查询没有任何限制，通过它们进行数据修改时的限制也很少。
-    - 视图是存储在数据库中的查询的sql语句，它主要出于两种原因：安全原因，视图可以隐藏一些数据，如：社会保险基金表，可以用视图只显示姓名，地址，而不显示社会保险号和工资数等，另一原因是可使复杂的查询易于理解和使用。
+    - 视图是一个**虚拟表，其内容由查询定义**。同真实的表一样，视图包含一系列带有名称的列和行数据。但是，视图并不在数据库中以存储的数据值集形式存在。行和列数据来自由定义视图的查询所引用的表，并且**在引用视图时动态生成**。
+    - 视图**具有表结构文件，但不存在数据文件**。
+    - 对其中所引用的基础表来说，视图的作用类似于**筛选**。定义视图的筛选可以来自当前或其它数据库的一个或多个表，或者其它视图。通过视图进行查询没有任何限制，通过它们进行数据修改时的限制也很少。
+    - 视图是**存储在数据库中的查询的sql语句**，它主要出于两种原因：**安全原因**，视图可以隐藏一些数据，如：社会保险基金表，可以用视图只显示姓名，地址，而不显示社会保险号和工资数等，另一原因是**可使复杂的查询易于理解和使用**。
 - 创建视图
     ```sql
     CREATE [OR REPLACE] [ALGORITHM = {UNDEFINED | MERGE | TEMPTABLE}] 
@@ -559,6 +559,274 @@ as select first_name, last_name from actor;
     - TEMPTABLE   临时表
         将视图执行完毕后，形成临时表，再做外层查询！
     - UNDEFINED   未定义(默认)，指的是MySQL自主去选择相应的算法。
+
+[SQL39 针对上面的salaries表emp_no字段创建索引idx_emp_no 并强制使用索引](https://www.nowcoder.com/practice/f9fa9dc1a1fc4130b08e26c22c7a1e5f?tpId=82&tqId=29807&rp=1&ru=/exam/oj&qru=/exam/oj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=undefined&judgeStatus=undefined&tags=&title=)
+```sql
+select * from salaries 
+force index (idx_emp_no) /*强制使用索引*/
+where emp_no = 10005;
+```
+
+[SQL40 在last_update后面新增加一列名字为create_date](https://www.nowcoder.com/practice/119f04716d284cb7a19fba65dd876b03?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+```sql
+alter table actor 
+add column create_date datetime not null default '2020-10-01 00:00:00';
+```
+
+- 修改表的字段机构（13.1.2. ALTER TABLE语法）
+    - ALTER TABLE 表名 操作名
+        - 操作名
+            - ADD[ COLUMN] 字段定义       -- 增加字段
+                - AFTER 字段名          -- 表示增加在该字段名后面
+                - FIRST               -- 表示增加在第一个
+            - ADD PRIMARY KEY(字段名)   -- 创建主键
+            - ADD UNIQUE [索引名] (字段名)-- 创建唯一索引
+            - ADD INDEX [索引名] (字段名) -- 创建普通索引
+            - DROP[ COLUMN] 字段名      -- 删除字段
+            - MODIFY[ COLUMN] 字段名 字段属性     -- 支持对字段属性进行修改，**不能修改字段名**(所有原有属性也需写上)
+            - CHANGE[ COLUMN] 原字段名 新字段名 字段属性      -- 支持**对字段名修改**
+            - DROP PRIMARY KEY    -- 删除主键(删除主键前需删除其AUTO_INCREMENT属性)
+            - DROP INDEX 索引名 -- 删除索引
+            - DROP FOREIGN KEY 外键    -- 删除外键
+
+
+[SQL41 构造一个触发器audit_log](https://www.nowcoder.com/practice/7e920bb2e1e74c4e83750f5c16033e2e?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+```sql
+create trigger audit_log
+after insert on employees_test
+for each row
+begin
+    insert into audit(emp_no, name) values(new.id, new.name);
+end
+```
+
+- 创建触发器的语法:
+```sql
+CREATE TRIGGER trigger_name
+trigger_time trigger_event ON tbl_name
+FOR EACH ROW
+trigger_stmt
+```
+其中：
+- trigger_name：标识触发器名称，用户自行指定；
+- trigger_time：标识触发时机，取值为 BEFORE 或 AFTER；
+- trigger_event：标识触发事件，取值为 INSERT、UPDATE 或 DELETE；
+- tbl_name：标识建立触发器的表名，即在哪张表上建立触发器；
+- trigger_stmt：触发器程序体，可以是一句SQL语句，或者用 BEGIN 和 END 包含的多条语句，每条语句结束要分号结尾。
+
+【NEW 与 OLD】 详解
+MySQL 中定义了 NEW 和 OLD，用来表示触发器的所在表中，触发了触发器的那一行数据。
+具体地：
+- 在 INSERT 型触发器中，NEW 用来表示将要（BEFORE）或已经（AFTER）插入的新数据；
+- 在 UPDATE 型触发器中，OLD 用来表示将要或已经被修改的原数据，NEW 用来表示将要或已经修改为的新数据；
+- 在 DELETE 型触发器中，OLD 用来表示将要或已经被删除的原数据；
+    - 使用方法： NEW.columnName （columnName 为相应数据表某一列名）
+
+[SQL42 删除emp_no重复的记录，只保留最小的id对应的记录。](https://www.nowcoder.com/practice/3d92551a6f6d4f1ebde272d20872cf05?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+
+```sql
+delete from titles_test
+where id not in
+(select * from 
+(select min(id) from titles_test 
+group by emp_no) as t);
+```
+- **MySQL中不允许在子查询的同时删除表数据（不能一边查一边把查的表删了）**, 索引需要再套一层。
+
+[SQL43 将所有to_date为9999-01-01的全部更新为NULL](https://www.nowcoder.com/practice/859f28f43496404886a77600ea68ef59?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+```sql
+update titles_test set to_date = null, from_date = '2001-01-01'
+where to_date = '9999-01-01';
+```
+
+[SQL44 将id=5以及emp_no=10001的行数据替换成id=5以及emp_no=10005](https://www.nowcoder.com/practice/2bec4d94f525458ca3d0ebf3bc8cd240?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+```sql
+update titles_test 
+set emp_no = replace(emp_no, 10001, 10005);
+```
+
+- 使用 replace 函数
+
+[SQL45 将titles_test表名修改为titles_2017](https://www.nowcoder.com/practice/5277d7f92aa746ab8aa42886e5d570d4?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+
+```sql
+rename table titles_test to titles_2017;
+```
+
+[SQL46 在audit表上创建外键约束，其emp_no对应employees_test表的主键id](https://www.nowcoder.com/practice/aeaa116185f24f209ca4fa40e226de48?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+```sql
+alter table audit 
+add constraint foreign key(emp_no)
+references employees_test(id);
+```
+- 列属性（列约束）
+    - PRIMARY 主键
+        - 能**唯一标识记录**的字段，可以作为主键。
+        - 一个表只能有**一个主键**。
+        - 主键具有**唯一性**。
+        - 声明字段时，用 primary key 标识。也可以在字段列表之后声明
+            - 例：create table tab ( id int, stu varchar(10), primary key (id));
+        - 主键字段的值**不能为null**。
+        - 主键可以由**多个字段**共同组成。此时需要在**字段列表后声明**的方法。
+            - 例：create table tab ( id int, stu varchar(10), age int, primary key (stu, age));
+    - UNIQUE 唯一索引（唯一约束）
+        - 使得某字段的值也**不能重复**（可以为 null）。
+    - NULL 约束
+        - null不是数据类型，是列的一个属性。
+        - 表示当前列是否可以为null，表示什么都没有。
+            - null, 允许为空。默认。
+            - not null, 不允许为空。
+                - insert into tab values (null, 'val');
+                    此时表示将第一个字段的值设为null, 取决于该字段是否允许为null
+    - DEFAULT 默认值属性
+        - 当前字段的默认值。
+        - insert into tab values (default, 'val');    -- 此时表示强制使用默认值。
+        - create table tab ( add_time timestamp default current_timestamp );
+        -- 表示将当前时间的时间戳设为默认值。
+        current_date, current_time
+    - AUTO_INCREMENT 自动增长约束
+        - 自动增长**必须为索引**（**主键或unique**）
+        - **只能存在一个**字段为自动增长。
+        默认为1开始自动增长。可以通过表属性 auto_increment = x进行设置，或 alter table tbl auto_increment = x;
+    - COMMENT 注释
+        - 例：create table tab ( id int ) comment '注释内容';
+    - FOREIGN KEY 外键约束
+        - 用于**限制主表与从表数据完整性**。
+        - alter table t1 add constraint `t1_t2_fk` foreign key (t1_id) references t2(id);
+            - 将表t1的t1_id外键关联到表t2的id字段。
+            - 每个外键都有一个名字，可以通过 constraint 指定
+        - 存在外键的表，称之为从表（子表），外键指向的表，称之为主表（父表）。
+        - 作用：保持数据一致性，完整性，主要目的是控制存储在外键表（从表）中的数据。
+        - MySQL中，可以对InnoDB引擎使用外键约束：
+            - 语法：
+                - foreign key (外键字段） references 主表名 (关联字段) [主表记录删除时的动作] [主表记录更新时的动作]
+                - 此时需要检测一个从表的外键需要约束为主表的已存在的值。外键在没有关联的情况下，可以设置为null.前提是该外键列，没有not null。
+                - 可以不指定主表记录更改或更新时的动作，那么此时主表的操作被拒绝。
+                - 如果指定了 on update 或 on delete：在删除或更新时，有如下几个操作可以选择：
+                    - 1. cascade，级联操作。主表数据被更新（主键值更新），从表也被更新（外键值更新）。主表记录被删除，从表相关记录也被删除。
+                    - 2. set null，设置为null。主表数据被更新（主键值更新），从表的外键被设置为null。主表记录被删除，从表相关记录外键被设置成null。但注意，要求该外键列，没有not null属性约束。
+                    - 3. restrict，拒绝父表删除和更新。
+                - （注意，外键只被InnoDB存储引擎所支持。其他引擎是不支持的。）
+
+[SQL48 将所有获取奖金的员工当前的薪水增加10%](https://www.nowcoder.com/practice/d3b058dcc94147e09352eb76f93b3274?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+```sql
+update salaries
+set salary = salary * 1.1
+where to_date = '9999-01-01'
+and emp_no in 
+(select emp_no from emp_bonus);
+
+/*也可以一般 join 一遍 update*/
+update salaries as s
+left join emp_bonus as eb
+on s.emp_no = eb.emp_no
+set s.salary = s.salary * 1.1
+where s.to_date = '9999-01-01'
+and eb.emp_no is not null
+```
+
+[SQL 50 将employees表中的所有员工的last_name和first_name通过引号连接起来。](https://www.nowcoder.com/practice/810bf4ee3ac64949b08983aa66ec7bee?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+```sql
+select concat(last_name, "\'", first_name)
+from employees;
+```
+- concat 函数
+
+[SQL51 查找字符串中逗号出现的次数](https://www.nowcoder.com/practice/e3870bd5d6744109a902db43c105bd50?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+```sql
+select id, length(string) - length(replace(string, ',', '')) 
+from strings;
+```
+- 用总长度替换成空字符串的总长度。
+
+[SQL52 获取employees中的first_name 并按后两个字母排序](https://www.nowcoder.com/practice/74d90728827e44e2864cce8b26882105?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+```sql
+select first_name from employees
+order by right(first_name, 2);
+```
+
+[SQL53 按照dept_no进行汇总](https://www.nowcoder.com/practice/6e86365af15e49d8abe2c3d4b5126e87?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+
+```sql
+select dept_no, group_concat(emp_no)
+from dept_emp
+group by dept_no;
+```
+- 聚合函数group_concat（X，Y），其中X是要连接的字段，Y是连接时用的符号，可省略，默认为逗号。
+此函数必须与GROUP BY配合使用。此题以dept_no作为分组，将每个分组中不同的emp_no用逗号连接起来（即可省略Y）。
+
+[SQL54 去掉最大最小后的平均工资](https://www.nowcoder.com/practice/95078e5e1fba4438b85d9f11240bc591?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+```sql
+select avg(salary) from salaries
+where to_date = '9999-01-01'
+and salary not in
+(select max(salary) from salaries 
+where to_date = '9999-01-01')
+and salary not in 
+(select min(salary) from salaries 
+where to_date = '9999-01-01');
+```
+
+[SQL55 分页查询employees表，每5行一页，返回第2页的数据](https://www.nowcoder.com/practice/f24966e0cb8a49c192b5e65339bc8c03?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+```sql
+select * from employees
+limit 5 offset 5
+
+select * from employees 
+limit 5, 5 /*(offset, start)*/
+```
+
+[SQL57 使用含有关键字exists查找未分配具体部门的员工的所有信息。](https://www.nowcoder.com/practice/c39cbfbd111a4d92b221acec1c7c1484?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+
+```sql
+select * from employees 
+where not exists
+(select * from dept_emp 
+ where dept_emp.emp_no = employees.emp_no);
+```
+
+- 谓词 exists:
+    - 作用: **判断是否存在某种条件的记录**，如果存在这种记录就返回TRUE,否则返回FALSE. 相当于IN。NOT EXISTS 相当于NOT IN
+    - 写法：通常在 where子句中，右侧书写一个参数，通常为子查询，左侧无参数
+
+
+[SQL59 获取有奖金的员工相关信息。](https://www.nowcoder.com/practice/5cdbf1dcbe8d4c689020b6b2743820bf?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+```sql
+select s.emp_no, e.first_name, e.last_name, b.btype, s.salary, 
+case 
+    when b.btype = 1 then s.salary * 0.1
+    when b.btype = 2 then s.salary * 0.2
+    else s.salary * 0.3
+    end as bonus
+from employees as e 
+join salaries as s 
+on e.emp_no = s.emp_no and s.to_date = '9999-01-01'
+join emp_bonus as b
+on e.emp_no = b.emp_no
+```
+
+- **case when** 用法
+
+
+[SQL60 统计salary的累计和running_total](https://www.nowcoder.com/practice/58824cd644ea47d7b2b670c506a159a6?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+```sql
+select emp_no, salary, sum(salary) over(order by emp_no) as running_total
+from salaries
+where to_date = '9999-01-01';
+```
+- 使用 sum 窗口函数，可以实现类似 cumsum 的效果。
+
+[SQL61 给出employees表中排名为奇数行的first_name](https://www.nowcoder.com/practice/e3cf1171f6cc426bac85fd4ffa786594?tpId=82&tqId=29829&rp=1&ru=/exam/oj&qru=/exam/oj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=undefined&judgeStatus=undefined&tags=&title=)
+```sql
+select first_name from
+employees where emp_no in
+(select emp_no from
+(select emp_no, row_number() over(order by first_name) r
+from employees) as t
+where t.r % 2 = 1)
+```
+
+- 窗口函数 row_number() 的使用。
 
 
 
