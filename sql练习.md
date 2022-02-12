@@ -828,6 +828,53 @@ where t.r % 2 = 1)
 
 - 窗口函数 row_number() 的使用。
 
+[SQL62 出现三次以上相同积分的情况](https://www.nowcoder.com/practice/c69ac94335744480aa50646864b7f24d?tpId=82&tqId=35079&rp=1&ru=/exam/oj&qru=/exam/oj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82%26page%3D1&difficulty=undefined&judgeStatus=undefined&tags=&title=)
+```sql
+select number from grade
+group by number
+having count(*) >= 3
+order by number;
+```
+- having与where的区别:
+    - having是在**分组后对数据进行过滤**
+    - where是在**分组前对数据进行过滤**
+    - having后面**可以使用聚合函数**
+    - where后面**不可以使用聚合**
+- 在查询过程中**执行顺序**：from > where > group（含聚合）> having> order > select。
+
+- Count(*), Count(1), Count(colName), Count(Distinct colName)
+    - Count() 括号中的元素: Count() 会将括号中的元素赋值给每一行。Count() 函数会将**赋值的次数**进行计数。
+        - Count(*) 和 Count(1) 分别表示将 * 和 1 赋值给每一行，没计算赋值的次数，所以二者完全一样(将结果换成 -13 答案一样不变)。
+        - Count(colName) 会计算特定列中**不是 null**的行数。
+        - Count(distinct colName) 会计算特定列中**不是 null 的不重复**的行数。
+    
+    ```sql
+    SELECT COUNT(CASE WHEN order_price > 1000 THEN 1 END)
+    AS significant_orders
+    FROM orders;
+    ```
+    - Find all the values in the column order_price above 1000.
+    - Assign the value 1 (you can assign any value you want) to these values.
+    - Assign NULL to rows with prices below 1000.
+    - Count the number of assigned 1s.
+    - Show the result in the column significant_orders.
+
+
+[SQL63 刷题通过的题目排名](https://www.nowcoder.com/practice/cd2e10a588dc4c1db0407d0bf63394f3?tpId=82&tqId=35080&rp=1&ru=/exam/oj&qru=/exam/oj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=undefined&judgeStatus=undefined&tags=&title=)
+```sql
+select id, number, dense_rank() over(order by number desc) as t_rank
+from passing_number
+order by t_rank, id
+```
+- 窗口函数 dense_rank()
+
+[SQL64 找到每个人的任务](https://www.nowcoder.com/practice/9dd9182d029a4f1d8c1324b63fc719c9?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+```sql
+select p.id, p.name, t.content from 
+person as p
+left join task as t
+on p.id = t.person_id;
+```
 
 
 
