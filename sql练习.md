@@ -876,6 +876,18 @@ left join task as t
 on p.id = t.person_id;
 ```
 
+[SQL65 异常的邮件概率](https://www.nowcoder.com/practice/d6dd656483b545159d3aa89b4c26004e?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+```sql
+select e.date, 
+round(sum(e.type = 'no_completed') / count(*), 3)
+from email as e
+    join user as u1 on e.send_id = u1.id
+    join user as u2 on e.receive_id = u2.id
+where u1.is_blacklist = 0 and u2.is_blacklist = 0
+group by e.date
+order by e.date;
+```
+- 练习聚合函数的很好的题目。
 
 
     
