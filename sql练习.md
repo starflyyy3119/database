@@ -889,10 +889,78 @@ order by e.date;
 ```
 - 练习聚合函数的很好的题目。
 
+[SQL66 牛客每个人最近的登录日期(一)](https://www.nowcoder.com/practice/ca274ebe6eac40ab9c33ced3f2223bb2?tpId=82&tqId=35084&rp=1&ru=/exam/oj&qru=/exam/oj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=undefined&judgeStatus=undefined&tags=&title=)
+```sql
+select user_id, max(date) as d
+from login
+group by user_id
+order by user_id;
+```
 
-    
+[SQL67 牛客每个人最近的登录日期(二)](https://www.nowcoder.com/practice/7cc3c814329546e89e71bb45c805c9ad?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+```sql
+select u.name as u_n, c.name as c_n, t.date
+from 
+(select l.user_id, l.client_id, max(l.date) as date
+from login as l
+group by l.user_id
+order by l.user_id) as t
+join user as u on u.id = t.user_id
+join client as c on c.id = t.client_id
+order by u.name;
+```
+- 在 66 的基础上，从 user 表找到名字，从 client 表找到客户端。
 
+[SQL68 牛客每个人最近的登录日期(三)](https://www.nowcoder.com/practice/16d41af206cd4066a06a3a0aa585ad3d?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+```sql
+select round(count(*) / (select count(distinct user_id) from login), 3) 
+from login
+where (user_id, date) in
+(select user_id, date_add(min(date), interval 1 day) 
+from login 
+group by user_id);
+```
+- 针对公式分别想清楚分子分母怎么计算。
+- in 可以**不仅仅是一个字段**。
 
+[SQL69 牛客每个人最近的登录日期(四)](https://www.nowcoder.com/practice/e524dc7450234395aa21c75303a42b0a?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+```sql
+select t0.date, count(t1.user_id) from 
+(select distinct date from login) as t0
+left join 
+(select user_id, min(date) as date from login group by user_id) as t1
+on t0.date = t1.date
+group by t0.date
+order by t0.date;
+```
+- 使用漏斗分析法用 left join 从左向右进行连接。
+
+[SQL70 牛客每个人最近的登录日期(五)](https://www.nowcoder.com/practice/ea0c56cd700344b590182aad03cc61b8?tpId=82&tags=&title=&difficulty=0&judgeStatus=0&rp=1&u_atoken=8cd972fb-02e8-439e-a6b5-cbc1940eade3&u_asession=01gyif48SzRtQRu4VBWrLbHJG916JR30yr4r6UiIbBZKXzNpTEeux1b_5eAvIFbKsZX0KNBwm7Lovlpxjd_P_q4JsKWYrT3W_NKPr8w6oU7K8DbViTV5ewSz4LBZ7lefzcMJtBx3S14qt35vRMTfjp8mBkFo3NEHBv0PZUm6pbxQU&u_asig=05-9S1MmLFHbQPxxTfc7uUI5i5Bfq9bF9q6SZBOMBZ0RK8kaJNnA0pDsAfPrVTQAxXYJKW1TI8PvL3BFzw9qkiLv0EjMKjWsaSYaC1zPW315D7wWHazyuMM3OTuSH9K0EwK34SbwltLkO1L7Cqcrp2BDUVgf0P8lP-YujUV4pkUc39JS7q8ZD7Xtz2Ly-b0kmuyAKRFSVJkkdwVUnyHAIJzVcXHugEmuVRGYiP5SXwfqSIT4Lt4Pcf5w5722121dzr1YpiKJZCArXmgv6vSk2RSO3h9VXwMyh6PgyDIVSG1W-NQnljLc21D-58TvT0GFro7E01qPfsRHyN5ozunDHp3Oa8hFkw1Mh4cnyxXsh-YLzSa84g3J5ErEZgxGPLt4GnmWspDxyAEEo4kbsryBKb9Q&u_aref=vq6XlXs60bzjojqDhjp4zpk3vXw%3D)
+```sql
+select t0.date, ifnull(round(count(t2.user_id) / count(t1.user_id), 3), 0)
+from 
+(select distinct date from login) as t0
+left join 
+(select user_id, min(date) as min_date
+from login
+group by user_id) as t1
+on t0.date = t1.min_date
+left join login as t2
+on t1.user_id = t2.user_id and datediff(t2.date, t1.min_date) = 1
+group by t0.date;
+```
+- 非常不错的题目，使用漏斗分析法，不断进行**左连接**。
+- 该题目也解释了一个问题，**使用 left join 后的数据行数是否会多于左表，答案是当然可以**, 如下图。
+    ![](./fig/login.png)
+
+[SQL71 牛客每个人最近的登录日期(六)](https://www.nowcoder.com/practice/572a027e52804c058e1f8b0c5e8a65b4?tpId=82&tags=&title=&difficulty=&judgeStatus=&rp=1&gioEnter=menu)
+```sql
+select t1.name, t0.date,
+sum(t0.number) over(partition by t0.user_id order by t0.date)
+from passing_number as t0
+left join user as t1 on t0.user_id = t1.id
+order by t0.date, t1.name;
+```
 
 
 
