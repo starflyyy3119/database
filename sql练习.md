@@ -961,6 +961,69 @@ from passing_number as t0
 left join user as t1 on t0.user_id = t1.id
 order by t0.date, t1.name;
 ```
+- 使用 sum 的**窗口函数**，实现求累计和的功能。
+
+[SQL72 考试分数(一)](https://www.nowcoder.com/practice/f41b94b4efce4b76b27dd36433abe398?tpId=82&tags=&title=&difficulty=&judgeStatus=&rp=1&gioEnter=menu)
+```sql
+select job, round(avg(score), 3) as avg from grade
+group by job
+order by avg desc;
+```
+
+[SQL73 考试分数(二)](https://www.nowcoder.com/practice/f456dedf88a64f169aadd648491a27c1?tpId=82&tags=&title=&difficulty=&judgeStatus=&rp=1&gioEnter=menu)
+```sql
+select t0.id, t0.job, t0.score
+from grade as t0
+left join
+(select job, avg(score) as score
+from grade 
+group by job) as t1
+on t0.job = t1.job
+where t0.score > t1.score;
+```
+- 筛选大于平均分数的人。
+
+[SQL74 考试分数(三)](https://www.nowcoder.com/practice/b83f8b0e7e934d95a56c24f047260d91?tpId=82&tags=&title=&difficulty=&judgeStatus=&rp=1&gioEnter=menu)
+```sql
+select t0.id, t1.name, t0.score from
+(select id, language_id, score,
+dense_rank() over(partition by language_id order by score desc) as r
+from grade) as t0
+left join language as t1 on t0.language_id = t1.id
+where t0.r in (1, 2)
+order by t1.name, t0.score desc, t0.id;
+```
+- 找每个语言对应的前两名，存在并列都输出，所以用 **dense_rank**。
+
+[SQL75 考试分数(四)](https://www.nowcoder.com/practice/502fb6e2b1ad4e56aa2e0dd90c6edf3c?tpId=82&tags=&title=&difficulty=&judgeStatus=&rp=1&gioEnter=menu)
+```sql
+select job, 
+      ceiling(count(*) / 2) as `start`,
+      floor(count(*) / 2 + 1) as `end`
+from grade
+group by job
+order by job;  
+```
+- 灵活使用 celing 和 floor。
+
+[SQL77 牛客的课程订单分析(一)](https://www.nowcoder.com/practice/d3aa5df807f046bea5003dbc04965d67?tpId=82&tqId=37915&rp=1&ru=/exam/oj&qru=/exam/oj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=undefined&judgeStatus=undefined&tags=&title=)
+```sql
+select * from order_info 
+where status = 'completed' and date > '2025-10-15'
+and product_name in ('C++', 'Java', 'Python');
+```
+
+[SQL78 牛客的课程订单分析(二)](https://www.nowcoder.com/practice/4ca4137cb490420cad06d2147ae67456?tpId=82&rp=1&ru=%2Fexam%2Foj&qru=%2Fexam%2Foj&sourceUrl=%2Fexam%2Foj%3Ftab%3DSQL%25E7%25AF%2587%26topicId%3D82&difficulty=&judgeStatus=&tags=&title=&gioEnter=menu)
+```sql
+select user_id from order_info 
+where product_name in ('Java', 'C++', 'Python')
+and status = 'completed'
+and date > '2025-10-15'
+group by user_id
+having count(*) >= 2
+order by user_id;
+```
+
 
 
 
